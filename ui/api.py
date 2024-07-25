@@ -3,9 +3,12 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import cv2
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+import json
 
 from hloc import extract_features, logger, match_dense, match_features
 from hloc.utils.viz import add_text, plot_keypoints
@@ -181,6 +184,21 @@ class ImageMatchingAPI(torch.nn.Module):
         self.pred = self._forward(img0, img1)
         if self.conf["ransac"]["enable"]:
             self.pred = self._geometry_check(self.pred)
+        print('输出的形状',self.pred.keys())
+        print('image0_orig',self.pred["image0_orig"].shape)
+        #print('image0',self.pred["image0"].shape)
+        print('keypoints0_orig',self.pred["keypoints0_orig"].shape)
+        print('keypoints0',self.pred["keypoints0"].shape)
+        print('mkeypoints0_orig',self.pred["mkeypoints0_orig"].shape)
+        print('mmkeypoints0_orig',self.pred["mmkeypoints0_orig"].shape)
+        print('mconf',self.pred["mconf"].shape)
+        # 提取特定键的值
+        extracted_data = {
+            "keypoints0_orig": self.pred["keypoints0_orig"].tolist(),
+            "keypoints1_orig": self.pred["keypoints1_orig"].tolist()
+        }
+        with open('output/data.json', 'w') as json_file:
+            json.dump(extracted_data, json_file,indent=4)
         return self.pred
 
     def _geometry_check(

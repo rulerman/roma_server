@@ -394,7 +394,7 @@ class ImageMatchingApp:
         self.app.queue().launch(
             server_name=self.server_name,
             server_port=self.server_port,
-            share=False,
+            share=True,
         )
 
     def ui_change_imagebox(self, choice):
